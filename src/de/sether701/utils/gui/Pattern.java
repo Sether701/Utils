@@ -36,21 +36,21 @@ public class Pattern {
 		return this.pattern.length;
 	}
 	
-	public Map<Integer, Button> exert(Map<Character, Button> buttons) {
+	public Map<Integer, Spacer> exert(Map<Character, Spacer> spacer) {
 		
-		Map<Integer, Button> map = new HashMap<>();
+		Map<Integer, Spacer> map = new HashMap<>();
 		
 		String pattern = this.fullPattern.replace(" ", "");
 		char[] characters = pattern.toCharArray();
 		for(int i = 0; i < characters.length; i++) {
-			if(buttons.containsKey(characters[i])) {
-				map.put(i, buttons.get(characters[i]));
+			if(spacer.containsKey(characters[i])) {
+				map.put(i, spacer.get(characters[i]));
 				continue;
 			} 
 			map.put(i, null);
 		}
 		
-		return null;
+		return map;
 	}
 	
 	

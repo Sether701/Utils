@@ -24,23 +24,22 @@ public class GUI implements Listener {
 	
 	private String name;
 	private Pattern pattern;
-	private Map<Character, Button> buttons;
+	private Map<Character, Spacer> spacer;
 	private Map<Integer, Button> keys;
 	private JavaPlugin plugin;
 	
-	public GUI(String name, Pattern pattern, Map<Character, Button> buttons, JavaPlugin plugin) {
+	public GUI(String name, Pattern pattern, Map<Character, Spacer> spacer, JavaPlugin plugin) {
 		this.name = name;
 		this.pattern =  pattern;
-		this.buttons = buttons;
+		this.spacer = spacer;
 		this.plugin = plugin;
 		
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
 	public void open(Player player) {
-		
 		GUIOpenEvent openEvent = new GUIOpenEvent(this, player);
-		
+		Bukkit.getPluginManager().callEvent(openEvent);
 		if(!(openEvent.isCancelled())) {
 			openEvent.getPlayer().openInventory(getInventory());
 			activeGUIs.put(openEvent.getPlayer(), openEvent.getGUI());
@@ -51,6 +50,7 @@ public class GUI implements Listener {
 		if(activeGUIs.containsKey(player)) {
 			
 			GUICloseEvent closeEvent = new GUICloseEvent(this, player);
+			Bukkit.getPluginManager().callEvent(closeEvent);
 			if(!(closeEvent.isCancelled())) {
 				activeGUIs.remove(player);
 				player.closeInventory();
@@ -63,16 +63,19 @@ public class GUI implements Listener {
 	}
 	
 	private Inventory getInventory() {
-		
 		Inventory inv = plugin.getServer().createInventory(null, pattern.getSize()*9, name);
 		keys = new HashMap<>();
 		
-		Map<Integer, Button> items = pattern.exert(buttons);
-		for(Map.Entry<Integer, Button> entry : items.entrySet()) {
-			inv.setItem(entry.getKey(), entry.getValue().getItem());
-			keys.put(entry.getKey(), entry.getValue());
+		Map<Integer, Spacer> items = pattern.exert(spacer);
+		for(Map.Entry<Integer, Spacer> entry : items.entrySet()) {
+			
+			if(entry.getValue() != null)
+				inv.setItem(entry.getKey(), entry.getValue().getItem());
+			
+			if(entry.getValue() instanceof Button) {
+				keys.put(entry.getKey(), (Button) entry.getValue());
+			}
 		}
-		
 		return inv;
 	}
 	
@@ -98,7 +101,6 @@ public class GUI implements Listener {
 		}
 		
 	}
-	
 	
 	
 	
